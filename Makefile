@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
 prefix ?= /usr/local
-bindir ?= $(prefix)/bin
+bindir ?= $(prefix)/bin/
 srcdir = Sources
 
 REPODIR = $(shell pwd)
