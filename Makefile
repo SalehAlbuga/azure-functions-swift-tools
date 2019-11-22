@@ -1,36 +1,16 @@
-SHELL = /bin/bash
-
 prefix ?= /usr/local
-bindir ?= $(prefix)/bin/
-srcdir = Sources
+bindir = $(prefix)/bin
 
-REPODIR = $(shell pwd)
-BUILDDIR = $(REPODIR)/.build
-SOURCES = $(wildcard $(srcdir)/**/*.swift)
+build:
+	swift build -c release --disable-sandbox
 
-.DEFAULT_GOAL = all
+install: build
+	install ".build/release/swiftfunc" "$(bindir)"
 
-.PHONY: all
-all: swiftfunc
-
-swiftfunc: $(SOURCES)
-	@swift build \
-		-c release \
-		--disable-sandbox \
-		--build-path "$(BUILDDIR)"
-
-.PHONY: install
-install: swiftfunc
-	@install "$(BUILDDIR)/release/swiftfunc" "$(bindir)"
-
-.PHONY: uninstall
 uninstall:
-	@rm -rf "$(bindir)/swiftfunc"
+	rm -rf "$(bindir)/swiftfunc"
 
-.PHONY: clean
-distclean:
-	@rm -f $(BUILDDIR)/release
+clean:
+	rm -rf .build
 
-.PHONY: clean
-clean: distclean
-	@rm -rf $(BUILDDIR)
+.PHONY: build install uninstall clean
