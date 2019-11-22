@@ -1,3 +1,3 @@
-# codegen test
+# Swift Functions Tools
 
 A description of this package.
