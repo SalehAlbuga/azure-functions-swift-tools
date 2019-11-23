@@ -155,7 +155,7 @@ struct Templates {
         }
         """
         
-        static let mainSwift = """
+        static let mainSwiftEmpty = """
         //
         //  main.swift
         //  {{ name }}

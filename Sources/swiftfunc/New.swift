@@ -33,7 +33,7 @@ struct NewCommand: Command {
         }
         
         guard templates.contains(type) else {
-            print("Please select one of the available templates: http, blob, timer")
+            print("Please select one of the available templates: http, blob, timer".bold.yellow)
             exit(0)
         }
         
@@ -43,14 +43,14 @@ struct NewCommand: Command {
         //        }
         
         guard let parentFolder = try? Folder.init(path: Process().currentDirectoryPath), parentFolder.containsFile(at: "Package.swift") else {
-            print("Not a Swift Functions project, please run Swiftfunc init first")
+            print("Not a Swift Functions project, please run Swiftfunc init first".bold.red)
             exit(1)
         }
         
         let projectName = parentFolder.name
         
         guard let folder = try? Folder.init(path: "\(parentFolder.path)Sources/\(projectName)/functions") else {
-            print("Not a Swift Functions project, please run Swiftfunc init first")
+            print("Not a Swift Functions project, please run Swiftfunc init first".bold.red)
             exit(1)
         }
         

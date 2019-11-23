@@ -32,7 +32,7 @@ struct InitCommand: Command {
         
         let folder = try Folder.init(path: Process().currentDirectoryPath).createSubfolderIfNeeded(withName: name)
         
-        print("Creating files.. 📝")
+        print("Creating project files.. 📝".bold.blue)
         let packageFile = try folder.createFile(named: "Package.swift")
         try packageFile.write(try environment.renderTemplate(string: Templates.ProjectFiles.packageSwift, context: ["name": name]))
         
@@ -50,9 +50,10 @@ struct InitCommand: Command {
         let _ = try codeFolder.createSubfolderIfNeeded(withName: "functions")
         
         let mainFile = try codeFolder.createFile(named: "main.swift")
-        try mainFile.write(try environment.renderTemplate(name: Templates.ProjectFiles.mainSwift, context: ["name": name]))
+        let mainContent = try environment.renderTemplate(string: Templates.ProjectFiles.mainSwiftEmpty, context: ["name": name])
+        try mainFile.write(mainContent)
         
-        print("Project created successfully ✅")
+        print("Project created successfully ✅".bold.green)
         
     }
     
