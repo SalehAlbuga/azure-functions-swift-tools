@@ -1,5 +1,7 @@
 # Swift Functions Tools ⚡️
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 CLI development tools for [Azure Functions for Swift](https://github.com/SalehAlbuga/azure-functions-swift)
 
 ## Installation
