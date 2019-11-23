@@ -7,6 +7,7 @@ build:
 
 install: build
 	install -d "$(bindir)"
+	install -d "$(libdir)"
 	install ".build/release/swiftfunc" "$(bindir)"
 	install ".build/release/libSwiftPM.dylib" "$(libdir)"
 	install_name_tool -change \
