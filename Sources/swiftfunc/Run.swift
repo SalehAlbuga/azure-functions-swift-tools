@@ -94,10 +94,12 @@ final class RunCommand: Command {
         
         env.append("TERM=ansi")
         
-//        let _ = FileManager.default.changeCurrentDirectoryPath(tempFolder.path)
+
 //        var str = ""
 //        shell("open .", result: &str, dir: tempFolder.path)
-        
+
+        let _ = FileManager.default.changeCurrentDirectoryPath(tempFolder.path)  
+              
         let p = PseudoTeletypewriter(path: "/usr/local/bin/func", arguments: ["host", "start"], environment: env)!
     
         let fileDescriptor = p.masterFileHandle.fileDescriptor

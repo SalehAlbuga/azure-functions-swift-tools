@@ -15,8 +15,8 @@ struct Templates {
             switch forType {
             case "http":
                 return http
-            case "blob":
-                return blob
+            case "queue":
+                return queue
             case "timer":
                 return timer
             default:
@@ -46,70 +46,77 @@ struct Templates {
             override func exec(request: HttpRequest, context: inout Context, callback: @escaping callback) throws {
                 
                 context.log("Function executing!")
-                
+        
                 let res = HttpResponse()
                 res.statusCode = 200
-                res.body  = "Hello!"
-                res.headers = ["Content-Type": "plain/text"]
+                context.log(String(describing: request.query))
+
+                var name: String?
+                context.log("BODY: \\(request.body?.description ?? "Body")")
+                
+                if let data = request.body, let bodyObj: [String: Any] = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0)) as? [String: Any] {
+                    name = bodyObj["name"] as? String
+                } else {
+                    name = request.query["name"] 
+                }
+                res.body  = "Hello \\(name ?? "buddy")!".data(using: .utf8)
                 
                 return callback(res);
             }
         }
         """
-        
-        static let blob = """
-            //
-            //  {{ name }}.swift
-            //  {{ project }}
-            //
-            //  Created on {{ date }}.
-            //
 
-            import Foundation
-            import AzureFunctions
+        static let queue = """
+        //
+        //  {{ name }}.swift
+        //  {{ project }}
+        //
+        //  Created on {{ date }}.
+        //
 
-            class {{ name }}: Function {
-                
-                required init() {
-                    super.init()
-                    self.name = "{{ name }}"
-                    self.trigger = Blob(name: "myBlob", path: "samples-workitems/{fileName}", connection: "<YourStorageAccountConnectionString>")
-                }
-                
-                override func exec(blob: Blob, context: inout Context, callback: @escaping callback) throws {
-                       context.log("Got bloby blob!")
-                       callback(true)
-                   }
-                
+        import Foundation
+        import AzureFunctions
+
+        class {{ name }}: Function {
+
+            required init() {
+                super.init()
+                self.name = "{{ name }}"
+                self.trigger = Queue(name: "myQueueTrigger", queueName: "queueName", connection: "AzureWebJobsStorage")
             }
+
+            override func exec(string: String, context: inout Context, callback: @escaping callback) throws {
+                context.log("Got queue item: \\(string)")
+                callback(true)
+            }
+        }
         """
         
         static let timer = """
-            //
-            //  {{ name }}.swift
-            //  {{ project }}
-            //
-            //  Created on {{ date }}.
-            //
+        //
+        //  {{ name }}.swift
+        //  {{ project }}
+        //
+        //  Created on {{ date }}.
+        //
 
-            import Foundation
-            import AzureFunctions
+        import Foundation
+        import AzureFunctions
 
-            class {{ name }}: Function {
-                
-                required init() {
-                    super.init()
-                    self.name = "{{ name }}"
-                    self.trigger = Timer.initTrigger(name: "myTimer", schedule: "*/5 * * * * *")
-                }
-                
-                override func exec(timer: Timer, context: inout Context, callback: @escaping callback) throws {
-                    context.log("It is time!")
-                    callback(true)
-                }
-                
+        class {{ name }}: Function {
+            
+            required init() {
+                super.init()
+                self.name = "{{ name }}"
+                self.trigger = TimerTrigger(name: "myTimer", schedule: "*/5 * * * * *")
             }
-
+            
+            override func exec(timer: TimerTrigger, context: inout Context, callback: @escaping callback) throws {
+                context.log("It is time!")
+                callback(true)
+            }
+            
+        }
         """
         
     }
@@ -121,28 +128,28 @@ struct Templates {
         """
         
         static let hostJson = """
-            {
-                "version": "2.0",
-                "extensionBundle": {
-                    "id": "Microsoft.Azure.Functions.ExtensionBundle",
-                    "version": "[1.*, 2.0.0)"
-                }
+        {
+            "version": "2.0",
+            "extensionBundle": {
+                "id": "Microsoft.Azure.Functions.ExtensionBundle",
+                "version": "[1.*, 2.0.0)"
             }
+        }
         """
         
         static let workerConfigJson = """
-            {
-                "description": {
-                    "arguments": [
-                        "run"
-                    ],
-                    "defaultExecutablePath": "{{ execPath }}",
-                    "extensions": [
-                        ".swift"
-                    ],
-                    "language": "swift"
-                }
+        {
+            "description": {
+                "arguments": [
+                    "run"
+                ],
+                "defaultExecutablePath": "{{ execPath }}",
+                "extensions": [
+                    ".swift"
+                ],
+                "language": "swift"
             }
+        }
         """
         
         static let localSettingsJson = """
@@ -193,7 +200,7 @@ struct Templates {
         //  Only register/remove Functions. Do Not add other code
         //
 
-        import SwiftFunc
+        import AzureFunctions
 
         let registry = FunctionRegistry()
 
@@ -225,7 +232,7 @@ struct Templates {
                     // Targets can depend on other targets in this package, and on products in packages which this package depends on.
                     .target(
                         name: "{{ name }}",
-                        dependencies: [])
+                        dependencies: ["AzureFunctions"])
                 ]
             )
             """

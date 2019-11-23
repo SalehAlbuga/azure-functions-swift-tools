@@ -19,7 +19,7 @@ struct NewCommand: Command {
     private let type: PositionalArgument<String>
     private let name: OptionArgument<String>
     
-    private let templates: [String] = ["http", "queue", "timer", "blob"]
+    private let templates: [String] = ["http", "queue", "timer"]
     
     init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
@@ -66,7 +66,10 @@ struct NewCommand: Command {
         
         let funcFile = try folder.createFile(named: "\(name).swift")
         //
-        let content = try environment.renderTemplate(string: Templates.Functions.template(forType: type), context: ["name": name])
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd-MM-YY"
+        let content = try environment.renderTemplate(string: Templates.Functions.template(forType: type), context: ["name": name, "project": projectName, "date": formatter.string(from: date)])
         try funcFile.write(content)
         
         let sourcesFolder = try parentFolder.createSubfolderIfNeeded(withName: "Sources")
