@@ -48,11 +48,7 @@ struct Templates {
                 context.log("Function executing!")
         
                 let res = HttpResponse()
-                res.statusCode = 200
-                context.log(String(describing: request.query))
-
                 var name: String?
-                context.log("BODY: \\(request.body?.description ?? "Body")")
                 
                 if let data = request.body, let bodyObj: [String: Any] = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0)) as? [String: Any] {
                     name = bodyObj["name"] as? String
