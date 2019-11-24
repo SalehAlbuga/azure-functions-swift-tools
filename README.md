@@ -8,8 +8,7 @@ CLI development tools for [Azure Functions for Swift](https://github.com/SalehAl
 Currently you can install the tools from Homebrew 🍺
 
 ```bash
-$ brew tap salehalbuga/formulae
-$ brew install swift-func
+$ brew install salehalbuga/formulae/swift-func
 ```
 
 ## Usage
