@@ -246,7 +246,7 @@ struct Templates {
         """
         
         static let dockerfile = """
-        FROM swift:5.0.0 AS build-image
+        FROM swift:5.0 AS build-image
 
         WORKDIR /src
         COPY . .
