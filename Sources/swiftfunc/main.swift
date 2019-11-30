@@ -17,14 +17,14 @@ protocol Command {
 }
 
 
-var registry = CommandRegistry(usage: "<command> <options>", overview: "Swift Functions tools")
+var registry = CommandRegistry(usage: "<command> <options>", overview: "Swift Functions tools v0.2.0")
 
 registry.register(command: InitCommand.self)
 registry.register(command: NewCommand.self)
 if #available(OSX 10.13, *) {
     registry.register(command: RunCommand.self)
 } else {
-    print("Requires OSX 10.13 or later ☹️")
+    print("Requires OSX 10.13 or later 😕")
 }
 
 registry.run()

@@ -119,8 +119,8 @@ final class RunCommand: Command {
         channel.setLimit(lowWater: Int(10000))
         errChannel.setLimit(lowWater: Int(10000))
             
-        channel.setInterval(interval: .seconds(3), flags:[.strictInterval])
-        errChannel.setInterval(interval: .seconds(3), flags:[.strictInterval])
+        channel.setInterval(interval: .seconds(1), flags:[.strictInterval])
+        errChannel.setInterval(interval: .seconds(1), flags:[.strictInterval])
         
         channel.read(offset: 0, length: Int.max, queue: global) { (closed, dispatchData, error) in
             if let data = dispatchData, !data.isEmpty {
@@ -209,8 +209,8 @@ final class RunCommand: Command {
         channel.setLimit(lowWater: Int(1000))
         errChannel.setLimit(lowWater: Int(1000))
         
-        channel.setInterval(interval: .milliseconds(500), flags:[.strictInterval])
-        errChannel.setInterval(interval: .milliseconds(500), flags:[.strictInterval])
+        channel.setInterval(interval: .milliseconds(250), flags:[.strictInterval])
+        errChannel.setInterval(interval: .milliseconds(250), flags:[.strictInterval])
         
         
         channel.read(offset: 0, length: Int.max, queue: global) { (closed, dispatchData, error) in
