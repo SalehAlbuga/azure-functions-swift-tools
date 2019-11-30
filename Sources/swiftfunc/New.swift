@@ -19,11 +19,11 @@ struct NewCommand: Command {
     private let type: PositionalArgument<String>
     private let name: OptionArgument<String>
     
-    private let templates: [String] = ["http", "queue", "timer"]
+    private let templates: [String] = ["http", "queue", "timer", "servicebus"]
     
     init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
-        type = subparser.add(positional: "type", kind: String.self, optional: false, usage: "Function type: http, timer, blob, empty.", completion: nil)
+        type = subparser.add(positional: "type", kind: String.self, optional: false, usage: "Function type: \(templates.joined(separator: ", ")).", completion: nil)
         name = subparser.add(option: "--name", shortName: "-n", kind: String.self, usage: "Function name!", completion: nil)
     }
     
@@ -33,15 +33,11 @@ struct NewCommand: Command {
         }
         
         guard templates.contains(type) else {
-            print("Please select one of the available templates: http, blob, timer".bold.yellow)
+            print("Please select one of the available templates: \(templates.joined(separator: ", "))".bold.yellow)
             exit(0)
         }
         
-        //        guard let folder = try? Folder.init(path: "/Users/saleh/Documents/Swift/codegenYard/swf/Sources/swf/functions"), let parentFolder = try? Folder.init(path: "/Users/saleh/Documents/Swift/codegenYard/swf/"), parentFolder.containsFile(at: "Package.swift")  else {
-        //            print("Not a Swift Functions project, please run Swiftfunc init first")
-        //            exit(0)
-        //        }
-        
+
         guard let parentFolder = try? Folder.init(path: Process().currentDirectoryPath), parentFolder.containsFile(at: "Package.swift") else {
             print("Not a Swift Functions project, please run Swiftfunc init first".bold.red)
             exit(1)
@@ -60,7 +56,7 @@ struct NewCommand: Command {
         print("Creating Function with \(type) template ⚡️".bold.blue)
         
         guard !folder.containsFile(named: "\(name).swift") else {
-            print("A function with the name \(name) exits ☹️".bold.yellow)
+            print("A function with the name \(name) exits".bold.yellow)
             exit(0)
         }
         
