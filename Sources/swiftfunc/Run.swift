@@ -85,6 +85,16 @@ final class RunCommand: Command {
                    exit(1)
                }
         
+        //detect if Core Tools are installed
+        var strOutput: String = ""
+        shell(path: "/bin/bash", command: "-c", "which func", result: &strOutput, dir: srcFolder.path)
+        
+        if strOutput == "" { 
+            print("Function Core Tools not found 😞 Please install Core Tools: \n".red.bold)
+            print(" brew tap azure/functions \n brew install azure-functions-core-tools@2 or brew install azure-functions-core-tools@3 \n\n".yellow.bold)
+            exit(1)
+        }
+        
         print("Starting host 🏠 \n\n".blue.bold)
         
         var env: [String] = []
@@ -92,11 +102,7 @@ final class RunCommand: Command {
             env.append("\(evar.key)=\(evar.value)")
         }
         
-        env.append("TERM=ansi")
-        
-
-//        var str = ""
-//        shell("open .", result: &str, dir: tempFolder.path)
+        //env.append("TERM=ansi")
 
         let _ = FileManager.default.changeCurrentDirectoryPath(tempFolder.path)  
               
@@ -155,11 +161,11 @@ final class RunCommand: Command {
     
     
     @discardableResult
-    func shell(_ command: String, result: inout String, dir: String) -> Int32 {
+    func shell(path: String, command: String..., result: inout String, dir: String) -> Int32 {
         
         let task = Process()
-        task.launchPath = "/bin/bash"
-        task.arguments = ["-c", command]
+        task.launchPath = path
+        task.arguments = command
         task.qualityOfService = .default
         task.currentDirectoryPath = dir
         let pipe = Pipe()

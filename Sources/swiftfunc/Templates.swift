@@ -54,7 +54,7 @@ struct Templates {
                 var name: String?
                 context.log("BODY: \\(request.body?.description ?? "Body")")
                 
-                if let data = request.body, let bodyObj: [String: Any] = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0)) as? [String: Any] {
+                if let data = request.body, let bodyObj: [String: Any] = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     name = bodyObj["name"] as? String
                 } else {
                     name = request.query["name"] 
