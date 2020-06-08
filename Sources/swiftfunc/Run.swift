@@ -68,13 +68,7 @@ final class RunCommand: Command {
             exit(1)
         }
         
-        #if os(Linux)
-        let releaseFolder = "x86_64-unknown-linux"
-        #else
-        let releaseFolder = "x86_64-apple-macosx"
-        #endif
-        
-        let path = "\(srcFolder.path).build/\(releaseFolder)/release/functions"
+        let path = "\(srcFolder.path).build/release/functions"
         let est = try shellStreamOutput(path: path, command: "export", "--source", "\(srcFolder.path)", "--root", "\(tempFolder.path)", "--debug", dir: srcFolder.path, waitUntilExit: true)
         
                

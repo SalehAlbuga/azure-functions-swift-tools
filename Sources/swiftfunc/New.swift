@@ -18,29 +18,29 @@ struct NewCommand: Command {
     
     private let type: PositionalArgument<String>
     private let name: OptionArgument<String>
+    private let isHttpWorker: OptionArgument<Bool>
     
     private let templates: [String] = ["http", "queue", "timer"]
     
     init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
-        type = subparser.add(positional: "type", kind: String.self, optional: false, usage: "Function type: http, timer, blob, empty.", completion: nil)
+        type = subparser.add(positional: "type", kind: String.self, optional: false, usage: "Function type: http, timer, blob. Other samples can be found in docs", completion: nil)
         name = subparser.add(option: "--name", shortName: "-n", kind: String.self, usage: "Function name!", completion: nil)
+        isHttpWorker = subparser.add(option: "--http-worker", shortName: "-hw", kind: Bool.self, usage: "Create a new function for an Azure Functions custom handler project (http worker)", completion: nil)
     }
     
     func run(with arguments: ArgumentParser.Result) throws {
         guard let type = arguments.get(type), let name = arguments.get(name) else {
+            print("Please specify the function template and name: \n swiftfunc new http -n myFun [--hw]".yellow)
             return
         }
+        
+        let httpWorker: Bool = arguments.get(isHttpWorker) ?? false
         
         guard templates.contains(type) else {
             print("Please select one of the available templates: http, blob, timer".bold.yellow)
             exit(0)
         }
-        
-        //        guard let folder = try? Folder.init(path: "/Users/saleh/Documents/Swift/codegenYard/swf/Sources/swf/functions"), let parentFolder = try? Folder.init(path: "/Users/saleh/Documents/Swift/codegenYard/swf/"), parentFolder.containsFile(at: "Package.swift")  else {
-        //            print("Not a Swift Functions project, please run Swiftfunc init first")
-        //            exit(0)
-        //        }
         
         guard let parentFolder = try? Folder.init(path: Process().currentDirectoryPath), parentFolder.containsFile(at: "Package.swift") else {
             print("Not a Swift Functions project, please run Swiftfunc init first".bold.red)
@@ -69,7 +69,7 @@ struct NewCommand: Command {
         let date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "dd-MM-YY"
-        let content = try environment.renderTemplate(string: Templates.Functions.template(forType: type), context: ["name": name, "project": projectName, "date": formatter.string(from: date)])
+        let content = try environment.renderTemplate(string: Templates.Functions.template(forType: type, isHttp: httpWorker), context: ["name": name, "project": projectName, "date": formatter.string(from: date)])
         try funcFile.write(content)
         
         let sourcesFolder = try parentFolder.createSubfolderIfNeeded(withName: "Sources")
@@ -84,7 +84,7 @@ struct NewCommand: Command {
             functions.append("registry.register(\(name).self) \n")
         }
         let mainFile = try codeFolder.createFileIfNeeded(withName: "main.swift")
-        try mainFile.write(environment.renderTemplate(string: Templates.ProjectFiles.mainSwiftWithFunctions, context: ["functions": functions]))
+        try mainFile.write(environment.renderTemplate(string: Templates.ProjectFiles.mainSwift, context: ["functions": functions, "start" : httpWorker ? Templates.ProjectFiles.httpStart : Templates.ProjectFiles.classicStart]))
         
         
         print("New \(type) function created! 💃".bold.green)
