@@ -38,7 +38,7 @@ struct NewCommand: Command {
         let httpWorker: Bool = arguments.get(isHttpWorker) ?? false
         
         guard templates.contains(type) else {
-            print("Please select one of the available templates: http, blob, timer".bold.yellow)
+            print("Please select one of the available templates: \(templates.joined(separator: ", ")). Other samples can be found in docs".bold.yellow)
             exit(0)
         }
         

@@ -8,6 +8,8 @@
 import Foundation
 import SPMUtility
 
+let version = "0.4.1"
+
 protocol Command {
     var command: String { get }
     var overview: String { get }
@@ -17,7 +19,7 @@ protocol Command {
 }
 
 
-var registry = CommandRegistry(usage: "<command> <options>", overview: "Swift Functions tools")
+var registry = CommandRegistry(usage: "<command> <options>", overview: "Swift Functions tools v\(version)")
 
 registry.register(command: InitCommand.self)
 registry.register(command: NewCommand.self)
