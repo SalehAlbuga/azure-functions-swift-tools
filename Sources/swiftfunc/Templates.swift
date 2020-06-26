@@ -109,8 +109,8 @@ struct Templates {
             
             func run(req: Request) -> InvocationResponse {
                 var res = InvocationResponse()
-                if let payload = try? req.content.decode(InvocationRequest.self) {
-                    res.appendLog("Got \\(payload.Data?["myQueueTrigger"] ?? "")")
+                if let payload = try? req.content.decode(InvocationRequest.self), let queueItem = payload.data?["myQueueTrigger"] {
+                    res.appendLog("Got \\(queueItem)")
                 }
                 return res
             }
