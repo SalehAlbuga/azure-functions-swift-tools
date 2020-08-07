@@ -6,9 +6,7 @@
 //  Copyright (c) 2015 Eonil. All rights reserved.
 //
 
-import Darwin
 import Foundation
-import BSD
 // BSD functions properly wrapped in more simple and typesafe Swift manner.
 
 
@@ -31,20 +29,11 @@ public struct ForkResult {
         return value == 0
     }
     
-    ///    Calling this in child process side will crash the program.
+    ///  Calling this in child process side will crash the program.
     public var processID:pid_t {
         precondition(isRunningInParentProcess, "You tried to read this property from child process side. It is not allowed.")
         return value
     }
-}
-
-
-
-/// BSD `fork` function.
-/// https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/fork.2.html
-public func fork() -> ForkResult {
-    let pid1 = Eonil____BSD_C_fork()
-    return ForkResult(value: pid1)
 }
 
 /// BSD `forkpty`.
