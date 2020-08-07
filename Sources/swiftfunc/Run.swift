@@ -57,6 +57,8 @@ final class RunCommand: Command {
         
         tempFolder = try Folder.temporary.createSubfolderIfNeeded(withName: "\(projectName)-\(Int32.random(in: 0 ... INT32_MAX))")
         
+        print("Swift Functions tools v\(version)".bold)
+
         print("Building Project.. 💻".bold.blue)
         
         let cst = try shellStreamOutput(path: "/bin/bash", command: "-c", "swift build -c release", dir: srcFolder.path, waitUntilExit: true)
