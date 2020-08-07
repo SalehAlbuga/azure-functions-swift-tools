@@ -56,7 +56,7 @@ public final class PseudoTeletypewriter {
 //            debugLog("`forkpty` failed.")
             
             ///    Below two lines are useless but inserted to suppress compiler error.
-            _masterFileHandle = FileHandle()
+            _masterFileHandle = FileHandle.init(fileDescriptor: 0)
             _childProcessID = 0
             return nil
         }

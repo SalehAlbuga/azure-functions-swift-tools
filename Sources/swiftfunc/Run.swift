@@ -57,7 +57,9 @@ final class RunCommand: Command {
         
         tempFolder = try Folder.temporary.createSubfolderIfNeeded(withName: "\(projectName)-\(Int32.random(in: 0 ... INT32_MAX))")
         
-        print("Compiling Project.. 💻".bold.blue)
+        print("Swift Functions tools v\(version)".bold)
+
+        print("Building Project.. 💻".bold.blue)
         
         let cst = try shellStreamOutput(path: "/bin/bash", command: "-c", "swift build -c release", dir: srcFolder.path, waitUntilExit: true)
         
@@ -85,7 +87,13 @@ final class RunCommand: Command {
         
         if strOutput == "" { 
             print("Function Core Tools not found 😞 Please install Core Tools: \n".red.bold)
+
+            #if os(macOS)
             print(" brew tap azure/functions \n brew install azure-functions-core-tools@2 or brew install azure-functions-core-tools@3 \n\n".yellow.bold)
+            #else
+            print(" https://github.com/Azure/azure-functions-core-tools#linux \n\n".yellow.bold)
+            #endif
+
             exit(1)
         }
         
@@ -99,8 +107,14 @@ final class RunCommand: Command {
         //env.append("TERM=ansi")
 
         let _ = FileManager.default.changeCurrentDirectoryPath(tempFolder.path)  
-              
-        let p = PseudoTeletypewriter(path: "/usr/local/bin/func", arguments: ["host", "start"], environment: env)!
+        
+        #if os(macOS)
+        let coreToolsPath = "/usr/local/bin/func"
+        #else
+        let coreToolsPath = "/usr/bin/func"
+        #endif
+
+        let p = PseudoTeletypewriter(path: coreToolsPath, arguments: ["host", "start"], environment: env)!
     
         let fileDescriptor = p.masterFileHandle.fileDescriptor
         

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import BSD
+// import BSD
 
 extension Data {
     func toUInt8Array() -> [UInt8] {
