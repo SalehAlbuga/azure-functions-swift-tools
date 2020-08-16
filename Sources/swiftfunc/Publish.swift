@@ -1,8 +1,8 @@
 //
-//  Run.swift
+//  Publish.swift
 //  SwiftFunc
 //
-//  Created by Saleh on 11/9/19.
+//  Created by Saleh on 08/14/20.
 //
 
 import Foundation
@@ -13,21 +13,25 @@ import Stencil
 import Dispatch
 import Rainbow
 
-
 @available(OSX 10.13, *)
-final class RunCommand: Command {
+final class PublishCommand: Command {
     
-    let command = "run"
-    let overview = "Run a Swift Function project locally. Azure Functions Core Tools is required"
+    let command = "publish"
+    let overview = "Publish Swift Function App to Azure (Consumption Plan)"
     
+    private let name: PositionalArgument<String>
+    private let isHttpWorker: OptionArgument<Bool>
+
+    var tempFolder: Folder!
+
     let sigintSrc = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
     let sigtermSrc = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .main)
-    
-    var tempFolder: Folder!
-    
+
     init(parser: ArgumentParser) {
-        let _ = parser.add(subparser: command, overview: overview)
-        
+        let subparser = parser.add(subparser: command, overview: overview)
+        name = subparser.add(positional: "name", kind: String.self, optional: false, usage: "Name: the name of the Function App in Azure", completion: nil)
+        isHttpWorker = subparser.add(option: "--http-worker", shortName: "-hw", kind: Bool.self, usage: "init the project as an Azure Functions custom handler (http worker)", completion: nil)
+
         signal(SIGINT, SIG_IGN)
         signal(SIGTERM, SIG_IGN)
                 
@@ -44,31 +48,24 @@ final class RunCommand: Command {
             exit(SIGTERM)
         }
         sigtermSrc.resume()
-        
     }
     
     func run(with arguments: ArgumentParser.Result) throws {
-        guard let srcFolder = try? Folder.init(path: Process().currentDirectoryPath), srcFolder.containsFile(at: "Package.swift") else {
-            print("Not a Swift Project")
+        #if os(macOS)
+        print("This command should be run from a Linux host. Please publish from a Swift Functions Dev Container".yellow)
+        exit(1)
+        #endif
+        let coreToolsPath = "/usr/bin/func" 
+
+        guard let name = arguments.get(name) else {
+            print("Please specify the Function App name".yellow)
             return
         }
         
-        // //detect if Core Tools are installed
-        // var strOutput: String = ""
-        // Shared.shell(path: "/bin/bash", command: "-c", "which func", result: &strOutput, dir: srcFolder.path)
-        
-        // if strOutput == "" { 
-        //     print("Function Core Tools not found 😞 Please install Core Tools: \n".red.bold)
-
-        //     #if os(macOS)
-        //     print(" brew tap azure/functions \n brew install azure-functions-core-tools@2 or brew install azure-functions-core-tools@3 \n\n".yellow.bold)
-        //     #else
-        //     print(" https://github.com/Azure/azure-functions-core-tools#linux \n\n".yellow.bold)
-        //     #endif
-
-        //     exit(1)
-        // }
-        Shared.checkFuncToolsInstallation()
+         guard let srcFolder = try? Folder.init(path: Process().currentDirectoryPath), srcFolder.containsFile(at: "Package.swift") else {
+            print("Not a Swift Project")
+            return
+        }
 
         let projectName = srcFolder.name
         
@@ -79,26 +76,21 @@ final class RunCommand: Command {
         print("Building Project.. 💻".bold.blue)
 
         try Shared.buildAndExport(sourceFolder: srcFolder, destFolder:tempFolder)
-        
-        print("Starting host 🏠 \n\n".blue.bold)
+
+        Shared.checkFuncToolsInstallation()
+
+        print("Publishing ⚡️ \n\n".blue.bold)
         
         var env: [String] = []
         for evar in Process().environment {
             env.append("\(evar.key)=\(evar.value)")
         }
         
-        //env.append("TERM=ansi")
+        let dGroup = DispatchGroup()
 
         let _ = FileManager.default.changeCurrentDirectoryPath(tempFolder.path)  
-        
-        #if os(macOS)
-        let coreToolsPath = "/usr/local/bin/func"
-        #else
-        let coreToolsPath = "/usr/bin/func"
-        #endif
 
-        let p = PseudoTeletypewriter(path: coreToolsPath, arguments: ["host", "start"], environment: env)!
-    
+        let p = PseudoTeletypewriter(path: coreToolsPath, arguments: ["func", "azure", "functionapp", "publish", "\(name)", "--force"], environment: env)!    
         let fileDescriptor = p.masterFileHandle.fileDescriptor
         
         let global = DispatchQueue.global(qos: .utility)
@@ -119,6 +111,7 @@ final class RunCommand: Command {
         channel.setInterval(interval: .seconds(3), flags:[.strictInterval])
         errChannel.setInterval(interval: .seconds(3), flags:[.strictInterval])
         
+        dGroup.enter()
         channel.read(offset: 0, length: Int.max, queue: global) { (closed, dispatchData, error) in
             if let data = dispatchData, !data.isEmpty {
                 DispatchQueue.main.async {
@@ -127,12 +120,13 @@ final class RunCommand: Command {
                     }
                 }
             }
-
             if closed {
+                dGroup.leave()
                 channel.close()
             }
         }
 
+        dGroup.enter()
         errChannel.read(offset: 0, length: Int.max, queue: global) { (closed, dispatchData, error) in
             if let data = dispatchData, !data.isEmpty {
                 DispatchQueue.main.async {
@@ -141,13 +135,16 @@ final class RunCommand: Command {
                     }
                 }
             }
-
             if closed {
+                dGroup.leave()
                 channel.close()
             }
         }
-        
+
+        dGroup.notify(queue: DispatchQueue.main) {
+            try! self.tempFolder.delete()
+            exit(0)
+        }
         dispatchMain()
-    }
-    
+    }  
 }
