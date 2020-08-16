@@ -55,7 +55,8 @@ final class PublishCommand: Command {
         print("This command should be run from a Linux host. Please publish from a Swift Functions Dev Container".yellow)
         exit(1)
         #endif
-        let coreToolsPath = "/usr/bin/func" 
+        let coreToolsPath = "/usr/bin/func"
+//         let coreToolsPath = "/usr/local/bin/func"
 
         guard let name = arguments.get(name) else {
             print("Please specify the Function App name".yellow)
@@ -76,6 +77,15 @@ final class PublishCommand: Command {
         print("Building Project.. 💻".bold.blue)
 
         try Shared.buildAndExport(sourceFolder: srcFolder, destFolder:tempFolder)
+
+        let srcLibFolder = try? Folder.init(path: "/usr/lib/swift/linux")
+        
+        if let destLibFolder = try? tempFolder.createSubfolderIfNeeded(at: "workers").createSubfolderIfNeeded(at: "swift") {
+            try srcLibFolder?.copy(to: destLibFolder)
+            try destLibFolder.subfolders.first?.rename(to: "lib")
+        }
+        
+        print("\(tempFolder.path)".bold)
 
         Shared.checkFuncToolsInstallation()
 
@@ -142,8 +152,8 @@ final class PublishCommand: Command {
         }
 
         dGroup.notify(queue: DispatchQueue.main) {
-            try! self.tempFolder.delete()
-            exit(0)
+           try! self.tempFolder.delete()
+           exit(0)
         }
         dispatchMain()
     }  
