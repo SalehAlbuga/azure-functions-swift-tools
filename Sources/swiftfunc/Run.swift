@@ -53,21 +53,6 @@ final class RunCommand: Command {
             return
         }
         
-        // //detect if Core Tools are installed
-        // var strOutput: String = ""
-        // Shared.shell(path: "/bin/bash", command: "-c", "which func", result: &strOutput, dir: srcFolder.path)
-        
-        // if strOutput == "" { 
-        //     print("Function Core Tools not found 😞 Please install Core Tools: \n".red.bold)
-
-        //     #if os(macOS)
-        //     print(" brew tap azure/functions \n brew install azure-functions-core-tools@2 or brew install azure-functions-core-tools@3 \n\n".yellow.bold)
-        //     #else
-        //     print(" https://github.com/Azure/azure-functions-core-tools#linux \n\n".yellow.bold)
-        //     #endif
-
-        //     exit(1)
-        // }
         Shared.checkFuncToolsInstallation()
 
         let projectName = srcFolder.name

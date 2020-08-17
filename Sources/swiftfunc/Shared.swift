@@ -16,7 +16,7 @@ import Rainbow
 @available(OSX 10.13, *)
 struct Shared {
 
-    static func buildAndExport(sourceFolder: Folder, destFolder: Folder) throws {
+    static func buildAndExport(sourceFolder: Folder, destFolder: Folder, debug: Bool = false, azureWorkerPath: Bool = false) throws {
          
         let cst = try shellStreamOutput(path: "/bin/bash", command: "-c", "swift build -c release", dir: sourceFolder.path, waitUntilExit: true)
         
@@ -28,7 +28,7 @@ struct Shared {
         }
         
         let path = "\(sourceFolder.path).build/release/functions"
-        let est = try shellStreamOutput(path: path, command: "export", "--source", "\(sourceFolder.path)", "--root", "\(destFolder.path)", "--debug", dir: sourceFolder.path, waitUntilExit: true)
+        let est = try shellStreamOutput(path: path, command: "export", "--source", "\(sourceFolder.path)", "--root", "\(destFolder.path)", debug ? "--debug" : "", azureWorkerPath ? "--azure-worker-path" : "", dir: sourceFolder.path, waitUntilExit: true)
         
         if est == 0 {
             print("Exported! \n".green.bold)

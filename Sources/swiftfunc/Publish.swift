@@ -17,10 +17,9 @@ import Rainbow
 final class PublishCommand: Command {
     
     let command = "publish"
-    let overview = "Publish Swift Function App to Azure (Consumption Plan)"
+    let overview = "Publish Swift Function App to Azure to run outside a container (Consumption Plan)"
     
     private let name: PositionalArgument<String>
-    private let isHttpWorker: OptionArgument<Bool>
 
     var tempFolder: Folder!
 
@@ -30,20 +29,19 @@ final class PublishCommand: Command {
     init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
         name = subparser.add(positional: "name", kind: String.self, optional: false, usage: "Name: the name of the Function App in Azure", completion: nil)
-        isHttpWorker = subparser.add(option: "--http-worker", shortName: "-hw", kind: Bool.self, usage: "init the project as an Azure Functions custom handler (http worker)", completion: nil)
 
         signal(SIGINT, SIG_IGN)
         signal(SIGTERM, SIG_IGN)
                 
         sigintSrc.setEventHandler { [weak self] in
-            print("Terminating..".white)
+            print("\nTerminating..".white)
             try! self?.tempFolder.delete()
             exit(SIGINT)
         }
         sigintSrc.resume()
         
         sigtermSrc.setEventHandler { [weak self] in
-            print("Terminating..".white)
+            print("\nTerminating..".white)
             try! self?.tempFolder.delete()
             exit(SIGTERM)
         }
@@ -56,7 +54,6 @@ final class PublishCommand: Command {
         exit(1)
         #endif
         let coreToolsPath = "/usr/bin/func"
-//         let coreToolsPath = "/usr/local/bin/func"
 
         guard let name = arguments.get(name) else {
             print("Please specify the Function App name".yellow)
@@ -76,7 +73,7 @@ final class PublishCommand: Command {
 
         print("Building Project.. 💻".bold.blue)
 
-        try Shared.buildAndExport(sourceFolder: srcFolder, destFolder:tempFolder)
+        try Shared.buildAndExport(sourceFolder: srcFolder, destFolder:tempFolder, azureWorkerPath: true)
 
         let srcLibFolder = try? Folder.init(path: "/usr/lib/swift/linux")
         
@@ -155,6 +152,7 @@ final class PublishCommand: Command {
            try! self.tempFolder.delete()
            exit(0)
         }
+        
         dispatchMain()
     }  
 }
