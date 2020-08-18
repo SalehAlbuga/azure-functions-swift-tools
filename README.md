@@ -7,8 +7,20 @@ CLI development tools for [Azure Functions for Swift](https://github.com/SalehAl
 ## Installation
 Currently you can install the tools from Homebrew 🍺
 
+### macOS
 ```bash
 $ brew install salehalbuga/formulae/swift-func
+```
+
+### Linux
+Clone the repo
+```bash
+git clone https://github.com/SalehAlbuga/azure-functions-swift-tools
+```
+
+Install
+```bash
+make install
 ```
 
 ## Usage

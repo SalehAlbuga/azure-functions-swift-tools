@@ -8,7 +8,7 @@
 import Foundation
 import SPMUtility
 
-let version = "0.4.1"
+let version = "0.5.0"
 
 protocol Command {
     var command: String { get }
@@ -25,8 +25,9 @@ registry.register(command: InitCommand.self)
 registry.register(command: NewCommand.self)
 if #available(OSX 10.13, *) {
     registry.register(command: RunCommand.self)
+    registry.register(command: PublishCommand.self)
 } else {
-    print("Requires OSX 10.13 or later 😕")
+    print("Requires macOS 10.13 or later ☹️")
 }
 
 registry.run()
