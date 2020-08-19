@@ -61,7 +61,7 @@ final class RunCommand: Command {
         
         print("Swift Functions tools v\(version)".bold)
 
-        print("Building Project.. 💻".bold.blue)
+        print("Compiling Project.. 💻".bold.blue)
 
         try Shared.buildAndExport(sourceFolder: srcFolder, destFolder:tempFolder)
         

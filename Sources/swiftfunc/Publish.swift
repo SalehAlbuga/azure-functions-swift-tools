@@ -71,7 +71,7 @@ final class PublishCommand: Command {
         
         print("Swift Functions tools v\(version)".bold)
 
-        print("Building Project.. 💻".bold.blue)
+        print("Compiling Project.. 💻".bold.blue)
 
         try Shared.buildAndExport(sourceFolder: srcFolder, destFolder:tempFolder, azureWorkerPath: true)
 
@@ -81,8 +81,6 @@ final class PublishCommand: Command {
             try srcLibFolder?.copy(to: destLibFolder)
             try destLibFolder.subfolders.first?.rename(to: "lib")
         }
-        
-        print("\(tempFolder.path)".bold)
 
         Shared.checkFuncToolsInstallation()
 
