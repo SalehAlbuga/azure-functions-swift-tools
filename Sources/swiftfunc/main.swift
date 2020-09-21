@@ -8,7 +8,7 @@
 import Foundation
 import SPMUtility
 
-let version = "0.6.1"
+let version = "0.6.2"
 
 protocol Command {
     var command: String { get }
