@@ -82,7 +82,7 @@ final class RunCommand: Command {
         let coreToolsPath = "/usr/bin/func"
         #endif
 
-        let p = PseudoTeletypewriter(path: coreToolsPath, arguments: ["host", "start"], environment: env)!
+        let p = PseudoTeletypewriter(path: coreToolsPath, arguments: ["host", "start", "--verbose"], environment: env)!
     
         let fileDescriptor = p.masterFileHandle.fileDescriptor
         
