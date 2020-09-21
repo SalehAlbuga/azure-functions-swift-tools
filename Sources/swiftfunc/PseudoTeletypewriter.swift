@@ -1,10 +1,12 @@
-//
-//  PseudoTeletypewriter.swift
-//  BSD
-//
-//  Created by Hoon H. on 2015/01/12.
-//  Copyright (c) 2015 Eonil. All rights reserved.
-//
+/*
+Copyright (c) 2015, Hoon H. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import Foundation
 
@@ -53,7 +55,7 @@ public final class PseudoTeletypewriter {
                 fatalError("Returning from `execute` means the command was failed. This is unrecoverable error in child process side, so just abort the execution.")
             }
         } else {
-//            debugLog("`forkpty` failed.")
+            debugLog("`forkpty` failed.")
             
             ///    Below two lines are useless but inserted to suppress compiler error.
             _masterFileHandle = FileHandle.init(fileDescriptor: 0)
@@ -76,7 +78,7 @@ public final class PseudoTeletypewriter {
     public func waitUntilChildProcessFinishes() {
         var stat_loc = 0 as Int32
         let childpid1 = waitpid(_childProcessID, &stat_loc, 0)
-//        debugLog("child process quit: pid = \(childpid1)")
+        debugLog("child process quit: pid = \(childpid1)")
     }
 }
 
